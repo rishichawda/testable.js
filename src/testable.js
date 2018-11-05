@@ -55,8 +55,8 @@ export default (TestableComponent, selectors = {}) => {
      * Attach the element selector to node.
      * @memberof Testable
      */
-    attachSelector = (selector) => {
-      console.log('attach selector', selector)
+    attachSelector = (selector, { nodeElement }) => {
+      nodeElement.setAttribute('id', selector)
     }
 
     /**
@@ -83,7 +83,7 @@ export default (TestableComponent, selectors = {}) => {
           break
         }
       }
-      return isPathValid
+      return { valid: isPathValid, node: currentNode }
     };
 
     /**
@@ -131,11 +131,11 @@ export default (TestableComponent, selectors = {}) => {
     validateSelectors = () => {
       for (let selector in selectors) {
         let path = selector.split('>')
-        let valid = this._treeNodes.hasOwnProperty(path[0])
+        let { valid, node } = this._treeNodes.hasOwnProperty(path[0])
           ? this.findPath(path.slice(1), this._treeNodes[path[0]])
-          : false
+          : { valid: false, node: null }
         if (valid) {
-          this.attachSelector(selector)
+          this.attachSelector(selectors[selector], node)
         }
       }
     };
