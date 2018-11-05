@@ -30,14 +30,22 @@ import Component from 'path/to/component';
 it(
   'should run some tests and pass'
   , () => {
+  
+  // Define selector object with element selectors and unique-id pairs.
   const selectors =  {
       "element-selector": "element-id",
       "element-selector-2": "element-id-2"
   };
-  const TestableComponent = testable(Component, selectors);
+  
+  // Wrap the component with testable to attach ids to the elements.
+  const TestableComponent = testable(Component, selectors);     <------  This is where magic happens!
+  
+  // Mount the component.
   const wrapper = shallow(
     <TestableComponent />
   );
+  
+  // Test it out!
   wrapper.find("#element-id").to.have.lengthOf(1);
   wrapper.find("#element-id-2").to.have.lengthOf(1);
 });
