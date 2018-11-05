@@ -50,6 +50,15 @@ export default (TestableComponent, selectors = {}) => {
       selectorProp: null
     };
 
+
+    /**
+     * Attach the element selector to node.
+     * @memberof Testable
+     */
+    attachSelector = (selector) => {
+      console.log('attach selector', selector)
+    }
+
     /**
      * Find path to the node.
      * If path exists, return true else false.
@@ -62,14 +71,14 @@ export default (TestableComponent, selectors = {}) => {
       for (let index in path) {
         let node = path[index]
         let isValid = false
-        for (let child in currentNode) {
-          if (!isValid && currentNode[child].hasOwnProperty(node)) {
+        for (let child in currentNode.children) {
+          if (!isValid && currentNode.children[child].hasOwnProperty(node)) {
             isValid = true
-            currentNode = currentNode[child][node]
-            return
+            currentNode = currentNode.children[child][node]
+            break
           }
         }
-        if(!isValid) {
+        if (!isValid) {
           isPathValid = false
           break
         }
@@ -92,7 +101,10 @@ export default (TestableComponent, selectors = {}) => {
           const { localName } = children[child]
           if (localName) {
             branches[child] = {
-              [localName]: this.generateTreeNodes(children[child])
+              [localName]: {
+                nodeElement: children[child],
+                children: this.generateTreeNodes(children[child])
+              }
             }
           }
         }
@@ -106,7 +118,7 @@ export default (TestableComponent, selectors = {}) => {
      */
     updateTreeNodes = _rootNode => {
       this._treeNodes = {
-        [_rootNode.localName]: this.generateTreeNodes(_rootNode)
+        [_rootNode.localName]: { nodeElement: _rootNode, children: this.generateTreeNodes(_rootNode) }
       }
     };
 
@@ -122,7 +134,9 @@ export default (TestableComponent, selectors = {}) => {
         let valid = this._treeNodes.hasOwnProperty(path[0])
           ? this.findPath(path.slice(1), this._treeNodes[path[0]])
           : false
-        console.log(valid)
+        if (valid) {
+          this.attachSelector(selector)
+        }
       }
     };
 
