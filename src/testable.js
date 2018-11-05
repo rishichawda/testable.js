@@ -70,12 +70,21 @@ export default (TestableComponent, selectors = {}) => {
       let isPathValid = true
       for (let index in path) {
         let node = path[index]
+        let nodeCount = null
+        if(node.indexOf('(') !== -1) {
+          nodeCount = +node.slice(node.indexOf('(')+1, node.indexOf(')'))
+          node = node.slice(0, node.indexOf('('))
+        }
         let isValid = false
         for (let child in currentNode.children) {
           if (!isValid && currentNode.children[child].hasOwnProperty(node)) {
-            isValid = true
-            currentNode = currentNode.children[child][node]
-            break
+            if(nodeCount && nodeCount > 1) {
+              nodeCount -= 1
+            } else {
+              isValid = true
+              currentNode = currentNode.children[child][node]
+              break
+            }
           }
         }
         if (!isValid) {
