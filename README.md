@@ -38,7 +38,7 @@ it(
   };
   
   // Wrap the component with testable to attach ids to the elements.
-  const TestableComponent = testable(Component, selectors);     <------  This is where magic happens!
+  const TestableComponent = testable(Component, selectors);  // <------  This is where magic happens!
   
   // Mount the component.
   const wrapper = shallow(
