@@ -8,18 +8,16 @@ import hoistNonReactStatics from 'hoist-non-react-statics'
 /**
  * Testable decorator.
  * @param {Node|ReactElement} TestableComponent - Component
- * @param {Object} selectors - Selectors 
+ * @param {Object} selectors - Selectors
  * @returns {function(TestableComponent:Function):Function} - TestableComponent
  */
 export default (TestableComponent, selectors = {}) => {
-
   /**
    * Wrapped instance of TestableComponent.
    * @class Testable
    * @extends {Component}
    */
   class Testable extends Component {
-
     /**
      * Creates an instance of Testable.
      * @param {*} args
@@ -53,6 +51,33 @@ export default (TestableComponent, selectors = {}) => {
     };
 
     /**
+     * Find path to the node.
+     * If path exists, return true else false.
+     * @param {arrayOf(string)} path - [Array of strings describing the path]
+     * @memberof Testable
+     */
+    findPath = (path, rootNode) => {
+      let currentNode = rootNode
+      let isPathValid = true
+      for (let index in path) {
+        let node = path[index]
+        let isValid = false
+        for (let child in currentNode) {
+          if (!isValid && currentNode[child].hasOwnProperty(node)) {
+            isValid = true
+            currentNode = currentNode[child][node]
+            return
+          }
+        }
+        if(!isValid) {
+          isPathValid = false
+          break
+        }
+      }
+      return isPathValid
+    };
+
+    /**
      * Converts DOM tree recursively into object.
      * This is optimised for parsing the selectors and checking
      * their validity against the supplied component.
@@ -79,7 +104,7 @@ export default (TestableComponent, selectors = {}) => {
      * Updates tree nodes when DOM is refreshed / as required.
      * @memberof Testable
      */
-    updateTreeNodes = (_rootNode) => {
+    updateTreeNodes = _rootNode => {
       this._treeNodes = {
         [_rootNode.localName]: this.generateTreeNodes(_rootNode)
       }
@@ -93,7 +118,11 @@ export default (TestableComponent, selectors = {}) => {
      */
     validateSelectors = () => {
       for (let selector in selectors) {
-        console.log(selector)
+        let path = selector.split('>')
+        let valid = this._treeNodes.hasOwnProperty(path[0])
+          ? this.findPath(path.slice(1), this._treeNodes[path[0]])
+          : false
+        console.log(valid)
       }
     };
 
@@ -116,7 +145,6 @@ export default (TestableComponent, selectors = {}) => {
       this.updateTreeNodes(this._rootNode)
       this.validateSelectors()
     }
-
 
     /**
      * @returns Wrapped component with new props.
