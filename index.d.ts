@@ -2,7 +2,7 @@ import * as React from 'react';
 
 declare module "testable" {
     type TReactTestableComponentId = {
-        [key: string]: string
+        [key: string]: String | Array<String>
     }
 
     interface TestComponent<P, S> extends React.Component<P, S> {
@@ -13,7 +13,8 @@ declare module "testable" {
       }
 
     export function testable(
-        selectors: Array<String>
+        TestableComponent: TestComponent<P, S>,
+        selectors: TReactTestableComponentId
       ): <P, S>(component: (new(props?: P, context?: any) => React.Component<P, S>) | React.SFC<P>) =>
         TestableComponent<P, S>;
 }

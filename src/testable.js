@@ -6,12 +6,17 @@ import PropTypes from 'prop-types'
 import hoistNonReactStatics from 'hoist-non-react-statics'
 
 /**
+ * @typedef {TReactTestableComponentId} TReactTestableComponentId
+ * @property {TReactTestableComponentId} selectors
+ */
+
+/**
  * Testable decorator.
  * @param {Node|ReactElement} TestableComponent - Component
- * @param {Object} selectors - Selectors
+ * @param {TReactTestableComponentId} selectors - Selectors
  * @returns {function(TestableComponent:Function):Function} - TestableComponent
  */
-export default (TestableComponent, selectors = {}) => {
+export default (TestableComponent, selectors = []) => {
   /**
    * Wrapped instance of TestableComponent.
    * @class Testable
