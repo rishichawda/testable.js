@@ -28,6 +28,7 @@ export default (TestableComponent, selectors = {}) => {
       this._testableComponentRef = null
       this._rootNode = null
       this._treeNodes = {}
+      this._properties = [ 'class', 'id' ]
     }
 
     /**
@@ -54,8 +55,10 @@ export default (TestableComponent, selectors = {}) => {
      * Attach the element selector to node.
      * @memberof Testable
      */
-    attachSelector = (selector, { nodeElement }) => {
-      nodeElement.setAttribute('id', selector)
+    attachSelector = (selector, { nodeElement }, property) => {
+      property === this._properties[0]
+        ? nodeElement.classList.add(selector)
+        : nodeElement.setAttribute(property, selector)
     };
 
     /**
@@ -74,8 +77,8 @@ export default (TestableComponent, selectors = {}) => {
           nodeCount = +node.slice(node.indexOf('(') + 1, node.indexOf(')'))
           node = node.slice(0, node.indexOf('('))
         }
-        if(currentNode.children.hasOwnProperty(node)) {
-          currentNode = currentNode.children[node][nodeCount-1]
+        if (currentNode.children.hasOwnProperty(node)) {
+          currentNode = currentNode.children[node][nodeCount - 1]
         } else {
           isPathValid = false
           break
@@ -98,7 +101,7 @@ export default (TestableComponent, selectors = {}) => {
         for (let child in children) {
           const { localName } = children[child]
           if (localName) {
-            if(branches[localName]) {
+            if (branches[localName]) {
               branches[localName].push({
                 children: this.generateTreeNodes(children[child]),
                 nodeElement: children[child]
@@ -110,7 +113,7 @@ export default (TestableComponent, selectors = {}) => {
                   nodeElement: children[child]
                 }
               ]
-            } 
+            }
           }
         }
       }
@@ -131,6 +134,21 @@ export default (TestableComponent, selectors = {}) => {
     };
 
     /**
+     * @param {arrayOf(string)} path
+     * @param {string} selector
+     * @param {string} property
+     * @memberof Testable
+     */
+    validateWithPath = (path, selector, property) => {
+      let { valid, node } = this._treeNodes.hasOwnProperty(path[0])
+        ? this.findPath(path.slice(1), this._treeNodes[path[0]])
+        : { valid: false, node: null }
+      if (valid) {
+        this.attachSelector(selector, node, property)
+      }
+    };
+
+    /**
      * Validate the given selectors against the DOM tree to check
      * for invalid selectors. If any invalid selector is found,
      * it is ignored.
@@ -138,12 +156,15 @@ export default (TestableComponent, selectors = {}) => {
      */
     validateSelectors = () => {
       for (let selector in selectors) {
-        let path = selector.split('>')
-        let { valid, node } = this._treeNodes.hasOwnProperty(path[0])
-          ? this.findPath(path.slice(1), this._treeNodes[path[0]])
-          : { valid: false, node: null }
-        if (valid) {
-          this.attachSelector(selectors[selector], node)
+        let path = selectors[selector]
+        if (typeof path === 'object') {
+          for (let index in path) {
+            let nPath = path[index].split('>')
+            this.validateWithPath(nPath, selector, this._properties[0])
+          }
+        } else {
+          path = path.split('>')
+          this.validateWithPath(path, selector, this._properties[1])
         }
       }
     };
