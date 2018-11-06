@@ -2,7 +2,7 @@
 
 A library that simplifies selecting nodes without changing your source code! Now you can spend more time ( and lines ) writing meaningful tests rather than navigating to correct nodes. :tada: :confetti_ball:
 
-Using `testable.js`, you can now attach `id`s to nodes you want to access while writing tests. No need to hard code them into your source code!
+Using `testable.js`, you can now attach selectors to nodes you want to access while writing tests. No need to hard code them into your component's source code!
 
 Also, you keep your source code clean and make tests easier to read and understand! :sparkles:
 
@@ -33,8 +33,8 @@ it(
   
   // Define selector object with element selectors and unique-id pairs.
   const selectors =  {
-      "element-selector": "element-id",
-      "element-selector-2": "element-id-2"
+      "element-id": "element-path",
+      "element-class": ["element-2-path"]
   };
   
   // Wrap the component with testable to attach ids to the elements.
@@ -47,7 +47,7 @@ it(
   
   // Test it out!
   wrapper.find("#element-id").to.have.lengthOf(1);
-  wrapper.find("#element-id-2").to.have.lengthOf(1);
+  wrapper.find(".element-class").to.have.lengthOf(1);
 });
 ```
 
@@ -55,7 +55,7 @@ it(
 
 As you can see, the `testable` function takes two parameters - `Component` and `selectors`.
 
-`Component` is the component you want to test. `selectors` is an object with keys as selectors for element which you want to assign a unique id to.
+Here, `selectors` is an object with keys as selectors for element which you want to assign that selector to, and value for the key is the path to element.
 
 <br />
 
@@ -90,26 +90,34 @@ To attach an id to `header` tag, you can simply define the `selector` object in 
 
 ```
 const selector = {
-    "div>div>header": "header-id",
+    "header-id": "div>div>header",
 };
 ```
 
+Here, the path `div>div>header` represents the `header` element which is nested inside two `div`s.
+
 <br />
 
-Let's say you want to attach some unique id to the `p` tag adjacent to the `section` element. You can edit the selector object as follows :
+Let's say you want to attach same class to the two `p` tags in your component. You can edit the selector object as follows :
 
 ```
 const selector = {
-    "div>div>header": "header-id",
-    "div>div(2)>p": "paragraph-id"
+    "header-id": "div>div>header",
+    "paragraph-class": ["div>div(2)>p", "div>p"]
 };
 ```
 
-<br />
+The path `div>div(2)>p` is interpreted as the paragraph element inside the second child of type `div` inside the `div` element at root of the component.
 
-That's all! Your elements are now selectable with just `wrapper.find('#unique-id')`. No need to spend time (and lines) navigating inside nested elements!
+To attach a class name to any element, just pass the element(s) in an array and `testable` will automatically understand that you want to use the selector as a class name for the element(s). For attaching as an `id`, you just need to pass a path as a `string`.
 
-<br />
+<br/>
+
+That's all! Now you have attached selectors to your elements without modifying the component source code and on the go while writing tests!
+
+Moreover, now it is more readable for anyone else attempting to modify / update tests for your components! :eyes:
+
+<br/>
 
 If you run into any bug(s) or have a request, open an issue [here](https://github.com/rishichawda/testable.js/issues).
 
