@@ -62,6 +62,17 @@ export default (TestableComponent, selectors = {}) => {
     };
 
     /**
+     * Whitespace cleanup for path.
+     * @memberof Testable
+     */
+    cleanPath = path => {
+      for (let x in path) {
+        path[x] = path[x].trim()
+      }
+      return path
+    };
+
+    /**
      * Find path to the node.
      * If path exists, return true else false.
      * @param {arrayOf(string)} path - [Array of strings describing the path]
@@ -139,12 +150,18 @@ export default (TestableComponent, selectors = {}) => {
      * @param {string} property
      * @memberof Testable
      */
-    validateWithPath = (path, selector, property) => {
+    validate = (path, selector, property) => {
       let { valid, node } = this._treeNodes.hasOwnProperty(path[0])
         ? this.findPath(path.slice(1), this._treeNodes[path[0]])
         : { valid: false, node: null }
       if (valid) {
         this.attachSelector(selector, node, property)
+      } else {
+        console.error(
+          `Error: Cannot find the DOM node at "${path.join(
+            ' > '
+          )}". Invalid path provided to testable.js`
+        )
       }
     };
 
@@ -159,12 +176,12 @@ export default (TestableComponent, selectors = {}) => {
         let path = selectors[selector]
         if (typeof path === 'object') {
           for (let index in path) {
-            let nPath = path[index].split('>')
-            this.validateWithPath(nPath, selector, this._properties[0])
+            let nPath = this.cleanPath(path[index].split('>'))
+            this.validate(nPath, selector, this._properties[0])
           }
         } else {
-          path = path.split('>')
-          this.validateWithPath(path, selector, this._properties[1])
+          path = this.cleanPath(path.split('>'))
+          this.validate(path, selector, this._properties[1])
         }
       }
     };
