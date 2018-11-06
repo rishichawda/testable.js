@@ -51,6 +51,8 @@ it(
 });
 ```
 
+**NOTE :** The above example is with [enzyme](https://github.com/airbnb/enzyme) and [chai](https://github.com/chaijs/chai), but you can use other test setups too!
+
 As you can see, the `testable` function takes two parameters - `Component` and `selectors`.
 
 `Component` is the component you want to test. `selectors` is an object with keys as selectors for element which you want to assign a unique id to.
