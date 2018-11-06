@@ -50,14 +50,13 @@ export default (TestableComponent, selectors = {}) => {
       selectorProp: null
     };
 
-
     /**
      * Attach the element selector to node.
      * @memberof Testable
      */
     attachSelector = (selector, { nodeElement }) => {
       nodeElement.setAttribute('id', selector)
-    }
+    };
 
     /**
      * Find path to the node.
@@ -70,24 +69,14 @@ export default (TestableComponent, selectors = {}) => {
       let isPathValid = true
       for (let index in path) {
         let node = path[index]
-        let nodeCount = null
-        if(node.indexOf('(') !== -1) {
-          nodeCount = +node.slice(node.indexOf('(')+1, node.indexOf(')'))
+        let nodeCount = 1
+        if (node.indexOf('(') !== -1) {
+          nodeCount = +node.slice(node.indexOf('(') + 1, node.indexOf(')'))
           node = node.slice(0, node.indexOf('('))
         }
-        let isValid = false
-        for (let child in currentNode.children) {
-          if (!isValid && currentNode.children[child].hasOwnProperty(node)) {
-            if(nodeCount && nodeCount > 1) {
-              nodeCount -= 1
-            } else {
-              isValid = true
-              currentNode = currentNode.children[child][node]
-              break
-            }
-          }
-        }
-        if (!isValid) {
+        if(currentNode.children.hasOwnProperty(node)) {
+          currentNode = currentNode.children[node][nodeCount-1]
+        } else {
           isPathValid = false
           break
         }
@@ -109,12 +98,19 @@ export default (TestableComponent, selectors = {}) => {
         for (let child in children) {
           const { localName } = children[child]
           if (localName) {
-            branches[child] = {
-              [localName]: {
-                nodeElement: children[child],
-                children: this.generateTreeNodes(children[child])
-              }
-            }
+            if(branches[localName]) {
+              branches[localName].push({
+                children: this.generateTreeNodes(children[child]),
+                nodeElement: children[child]
+              })
+            } else {
+              branches[localName] = [
+                {
+                  children: this.generateTreeNodes(children[child]),
+                  nodeElement: children[child]
+                }
+              ]
+            } 
           }
         }
       }
@@ -127,7 +123,10 @@ export default (TestableComponent, selectors = {}) => {
      */
     updateTreeNodes = _rootNode => {
       this._treeNodes = {
-        [_rootNode.localName]: { nodeElement: _rootNode, children: this.generateTreeNodes(_rootNode) }
+        [_rootNode.localName]: {
+          nodeElement: _rootNode,
+          children: this.generateTreeNodes(_rootNode)
+        }
       }
     };
 
