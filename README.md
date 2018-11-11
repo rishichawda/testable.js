@@ -51,8 +51,6 @@ it(
 });
 ```
 
-**NOTE :** The above example is with [enzyme](https://github.com/airbnb/enzyme) and [chai](https://github.com/chaijs/chai), but you can use other test setups too!
-
 As you can see, the `testable` function takes two parameters - `Component` and `selectors`.
 
 Here, `selectors` is an object with keys as selectors for element which you want to assign that selector to, and value for the key is the path to element.
