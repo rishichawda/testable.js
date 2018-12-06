@@ -1,7 +1,6 @@
 ![David](https://img.shields.io/david/rishichawda/testable.js.svg?style=popout)
 ![David](https://img.shields.io/david/dev/rishichawda/testable.js.svg?style=popout)
 ![GitHub issues](https://img.shields.io/github/issues/rishichawda/testable.js.svg?style=popout)
-![npm bundle size (minified + gzip)](https://img.shields.io/bundlephobia/minzip/react-testable.svg?style=popout)
 
 # Testable.js
 
